@@ -11,8 +11,9 @@ import {
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import ContractCard from './ContractCard'
+import AirportInfo from '../Airport/AirportInfo'
 
-const ContractList = ({ contracts }) => {
+const ContractList = ({ contracts, airport }) => {
   return (
     <Box position="absolute" z={1} top={16} left={4} bottom={12} width="30%">
       <Card>
@@ -32,7 +33,7 @@ const ContractList = ({ contracts }) => {
                 </Box>
               </TabPanel>
               <TabPanel>
-                <p>two!</p>
+                <AirportInfo airport={airport} />
               </TabPanel>
               <TabPanel>
                 <p>three!</p>
@@ -46,8 +47,9 @@ const ContractList = ({ contracts }) => {
 }
 
 ContractList.propTypes = {
-  contracts: PropTypes.array
+  contracts: PropTypes.array,
   // filteredContracts: PropTypes.array
+  airport: PropTypes.array
 }
 
 export default ContractList

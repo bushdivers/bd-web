@@ -72,7 +72,7 @@ const Search = ({ airport, contracts }) => {
             />
           </Source>
         </Map>
-        <ContractList contracts={contracts} filteredContracts={contracts}/>
+        <ContractList contracts={contracts} filteredContracts={contracts} airport={airport} />
         <ContractFilters airport={airport}/>
       </MapProvider>
     </>
