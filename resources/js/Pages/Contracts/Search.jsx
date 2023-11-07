@@ -6,30 +6,39 @@ import { mapboxToken, parseMapStyle, transformRequest } from '@/Helpers/map.help
 import ContractMarker from '@/Components/Contracts/ContractMarker.jsx'
 import ContractFilters from '@/Components/Contracts/ContractFilters.jsx'
 import ContractList from '@/Components/Contracts/ContractList.jsx'
-import { useAtomValue } from 'jotai'
-import { selectedContractAtom } from '@/State/contracts.store.js'
+import { useAtomValue, useAtom } from 'jotai'
+import { selectedContractAtom, displayContractRouteAtom } from '@/State/contracts.store.js'
 
-const Search = ({ airport, contracts }) => {
+const Search = ({ airport, contracts, metar }) => {
   const selectedContract = useAtomValue(selectedContractAtom)
+  const [displayContractRoute, setDisplayContractRoute] = useAtom(displayContractRouteAtom)
   // const [filteredContracts, setFilteredContracts] = useState(contracts)
   const [routeData, setRouteData] = useState()
 
   useEffect(() => {
+    loadRoute()
+    setDisplayContractRoute(true)
+  }, [selectedContract])
+
+  useEffect(() => {
+    setDisplayContractRoute(false)
+  }, [])
+
+  const loadRoute = () => {
+    const data = []
     if (selectedContract) {
-      const data = []
       selectedContract.contract_legs.forEach((leg) => {
         const depLngLat = [leg.dep_airport.lon, leg.dep_airport.lat]
         const arrLngLat = [leg.arr_airport.lon, leg.arr_airport.lat]
         data.push({ type: 'Feature', geometry: { type: 'LineString', coordinates: [depLngLat, arrLngLat] } })
       })
-
-      const geojson = {
-        type: 'FeatureCollection',
-        features: data
-      }
-      setRouteData(geojson)
     }
-  }, [selectedContract])
+    const geojson = {
+      type: 'FeatureCollection',
+      features: data
+    }
+    setRouteData(geojson)
+  }
 
   return (
     <>
@@ -56,7 +65,8 @@ const Search = ({ airport, contracts }) => {
               </Marker>
             ))
           ))}
-          <Source id="routeData" type="geojson" data={routeData}>
+          {displayContractRoute && (
+            <Source id="routeData" type="geojson" data={routeData}>
             <Layer
               id="lineLayer"
               type="line"
@@ -71,8 +81,10 @@ const Search = ({ airport, contracts }) => {
               }}
             />
           </Source>
+          )}
+
         </Map>
-        <ContractList contracts={contracts} filteredContracts={contracts} airport={airport} />
+        <ContractList contracts={contracts} filteredContracts={contracts} airport={airport} metar={metar} />
         <ContractFilters airport={airport}/>
       </MapProvider>
     </>
@@ -81,7 +93,8 @@ const Search = ({ airport, contracts }) => {
 
 Search.propTypes = {
   airport: PropTypes.object,
-  contracts: PropTypes.array
+  contracts: PropTypes.array,
+  metar: PropTypes.object
 }
 
 Search.layout = page => <AppLayout title="Contracts" isFullSize>{page}</AppLayout>

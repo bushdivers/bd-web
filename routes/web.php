@@ -27,4 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/contracts/{identifier}', [ContractController::class, 'getContracts']);
+    Route::post('/contracts/accept', [ContractController::class, 'acceptContract']);
+    Route::post('/contracts/return', [ContractController::class, 'returnContract']);
+    Route::post('/contracts/share', [ContractController::class, 'shareContract']);
 });

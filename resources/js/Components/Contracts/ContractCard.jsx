@@ -10,16 +10,19 @@ import {
   Heading,
   Text
 } from '@chakra-ui/react'
-import { useAtom } from 'jotai'
-import { selectedContractAtom } from '@/State/contracts.store.js'
+import { useAtom, useSetAtom } from 'jotai'
+import { selectedContractAtom, displayContractRouteAtom } from '@/State/contracts.store.js'
 import { useMap } from 'react-map-gl'
 import mapboxgl from 'mapbox-gl'
 import ContractLeg from './ContractLeg'
 import ContractFooter from './ContractFooter'
+import { router } from '@inertiajs/react'
 
 const ContractCard = ({ contract }) => {
   const [selectedContract, setSelectedContract] = useAtom(selectedContractAtom)
+  const setDisplayContractRoute = useSetAtom(displayContractRouteAtom)
   const { contractMap } = useMap()
+
   const onSelect = (c) => {
     setSelectedContract(c)
     const coordinates = []
@@ -36,6 +39,13 @@ const ContractCard = ({ contract }) => {
 
     contractMap.fitBounds(bounds, { padding: { top: 200, bottom: 200, left: 700, right: 100 } })
   }
+
+  const acceptContract = (id) => {
+    setSelectedContract(null)
+    setDisplayContractRoute(false)
+    router.post('/contracts/accept', { id })
+  }
+
   return (
         <Card onClick={() => onSelect(contract)} my={2} key={contract.id}
                 backgroundColor={contract.id === selectedContract?.id ? 'orange.100' : ''}>
@@ -72,7 +82,7 @@ const ContractCard = ({ contract }) => {
                     <ContractLeg key={leg.id} leg={leg} />
                 ))}
             </Box>
-            <ContractFooter contract={contract} buttonText="Add to Dispatch" buttonAction={() => window.alert('hello')} />
+            <ContractFooter contract={contract} buttonText="Add to Dispatch" buttonAction={() => acceptContract(contract.id)} />
             </CardBody>
         </Card>
   )
